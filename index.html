@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#006241">
-  <meta name="description" content="Dashboard corporativo de Transferencias Starbucks México con filtros, exportación y soporte PWA offline.">
-  <title>Transferencias | Starbucks México</title>
+  <meta name="description" content="Auditoría operativa de transferencias entre tiendas Starbucks México.">
+  <title>Transferencias | Auditoría Operativa</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
@@ -17,110 +17,68 @@
   <div class="app-shell">
     <aside class="sidebar" aria-label="Navegación principal">
       <div class="brand-block">
-        <div class="brand-logo" aria-hidden="true">
-          <svg viewBox="0 0 48 48" role="img"><circle cx="24" cy="24" r="20"></circle><path d="M15 30c4 5 14 5 18 0M16 20c4-6 12-7 17 0M19 24h.1M29 24h.1M24 18v10l4 2"></path></svg>
-        </div>
-        <div>
-          <p class="eyebrow">Starbucks México</p>
-          <h1>Transferencias</h1>
-        </div>
+        <div class="brand-logo" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20"></circle><path d="M15 30c4 5 14 5 18 0M16 20c4-6 12-7 17 0M19 24h.1M29 24h.1M24 18v10l4 2"></path></svg></div>
+        <div><p class="eyebrow">Starbucks México</p><h1>Transferencias</h1></div>
       </div>
       <nav class="nav-cards" aria-label="Secciones">
-        <button class="nav-card is-active" data-section="overview" type="button">
-          <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-4H4v4Z"></path></svg></span><span>Dashboard</span>
-        </button>
-        <button class="nav-card" data-section="analysis" type="button">
-          <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19V5m0 14h16M8 16v-5m4 5V8m4 8v-9"></path></svg></span><span>Análisis</span>
-        </button>
-        <button class="nav-card" data-section="movements" type="button">
-          <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M7 7h12M7 12h12M7 17h12M4 7h.01M4 12h.01M4 17h.01"></path></svg></span><span>Movimientos</span>
-        </button>
-        <button class="nav-card" data-section="quality" type="button">
-          <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7l8-4Zm-3 10 2 2 4-5"></path></svg></span><span>Calidad</span>
-        </button>
+        <button class="nav-card is-active" data-section="inicio" type="button"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-4H4v4Z"></path></svg></span><span>Inicio</span></button>
+        <button class="nav-card" data-section="auditoria" type="button"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 19V5m0 14h16M8 16v-5m4 5V8m4 8v-9"></path></svg></span><span>Auditoría</span></button>
+        <button class="nav-card" data-section="transferencias" type="button"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M7 7h12M7 12h12M7 17h12M4 7h.01M4 12h.01M4 17h.01"></path></svg></span><span>Transferencias</span></button>
+        <button class="nav-card" data-section="alertas" type="button"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3l9 16H3L12 3Zm0 6v4m0 4h.01"></path></svg></span><span>Alertas</span></button>
+        <button class="nav-card" data-section="directorio" type="button"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"></path></svg></span><span>Directorio</span></button>
+        <button class="nav-card" data-section="configuracion" type="button"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-5v3m0 12v3M4.2 4.2l2.1 2.1m11.4 11.4 2.1 2.1M1 12h3m16 0h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path></svg></span><span>Configuración</span></button>
       </nav>
-      <div class="sidebar-footer">
-        <p>Versión <strong>v1.1-github-ready-data-split</strong></p>
-        <p id="offlineStatus">PWA lista</p><p class="load-status"><span class="status-dot"></span><span id="dataLoadStatus">Índice pendiente</span></p>
-      </div>
     </aside>
 
     <main id="mainContent" class="main-content" tabindex="-1">
       <header class="hero-panel">
         <div class="hero-copy">
-          <p class="eyebrow">Corporate Monoline Dashboard</p>
-          <h2>Control integral de transferencias</h2>
-          <p class="hero-text">Visión ejecutiva, filtros inteligentes, carga de data por chunks y exportación operativa con base real de transferencias 2026.</p>
-          <div class="hero-actions">
-            <button class="primary-action" id="exportFiltered" type="button">Exportar CSV filtrado</button>
-            <button class="ghost-action" id="resetFilters" type="button">Limpiar filtros</button>
-          </div>
+          <p class="eyebrow">Auditoría operativa</p>
+          <h2>Revisión rápida de salidas e ingresos</h2>
+          <p class="hero-text" id="friendlyStatus">Listo para revisar transferencias</p>
+          <div class="hero-actions"><button class="ghost-action" id="resetFilters" type="button">Limpiar filtros</button></div>
         </div>
-        <div class="hero-art" aria-hidden="true">
-          <img src="assets/images/transferencia.png" alt="">
-        </div>
+        <div class="hero-art" aria-hidden="true"><img src="assets/images/transferencia.png" alt=""></div>
       </header>
 
       <section class="filter-panel" aria-labelledby="filterTitle">
-        <div class="section-heading compact">
-          <div>
-            <p class="eyebrow">Filtros</p>
-            <h3 id="filterTitle">Segmentación inteligente</h3>
-          </div>
-          <p class="filter-count" id="filterCount">Cargando índice…</p>
-        </div>
+        <div class="section-heading compact"><div><p class="eyebrow">Filtros</p><h3 id="filterTitle">Selecciona filtros para iniciar</h3></div><p class="filter-count" id="filterCount">Preparando información...</p></div>
         <div class="filters-grid">
+          <label>Mes<select id="monthFilter"><option value="">Todos</option></select></label>
+          <label>Semana<select id="weekFilter"><option value="">Todas</option></select></label>
           <label>Región<select id="regionFilter"><option value="">Todas</option></select></label>
           <label>DM<select id="dmFilter"><option value="">Todos</option></select></label>
           <label>Tienda<select id="storeFilter"><option value="">Todas</option></select></label>
           <label>Ingrediente<select id="ingredientFilter"><option value="">Todos</option></select></label>
-          <label>Semana<select id="weekFilter"><option value="">Todas</option></select></label>
-          <label>Flujo<select id="flowFilter"><option value="">Todos</option><option value="in">Entradas</option><option value="out">Salidas</option></select></label>
-          <label>Desde<input id="fromDate" type="date"></label>
-          <label>Hasta<input id="toDate" type="date"></label>
+          <label>Proveedor<select id="providerFilter"><option value="">Todos</option></select></label>
+          <label>Estado<select id="statusFilter"><option value="">Todos</option></select></label>
           <label class="wide">Búsqueda<input id="searchFilter" type="search" placeholder="Tienda, ingrediente, proveedor o CeCo"></label>
         </div>
       </section>
 
-      <section class="content-section is-visible" data-view="overview">
+      <section class="content-section is-visible" data-view="inicio">
         <div class="kpi-grid" id="kpiGrid"></div>
-        <div class="two-column">
-          <article class="card chart-card">
-            <div class="card-header"><div><p class="eyebrow">Tendencia</p><h3>Costo por día</h3></div><span id="rangeBadge" class="badge"></span></div>
-            <canvas id="dailyChart" height="220" aria-label="Costo por día" role="img"></canvas>
-          </article>
-          <article class="card chart-card">
-            <div class="card-header"><div><p class="eyebrow">Ranking</p><h3>Top tiendas por costo absoluto</h3></div></div>
-            <div id="topStores" class="rank-list"></div>
-          </article>
-        </div>
+        <article class="card full-card"><div class="card-header"><div><p class="eyebrow">Resumen</p><h3>Tiendas con salidas revisadas</h3></div><span class="badge" id="summaryBadge"></span></div><div class="table-wrap"><table><thead><tr><th>Tienda</th><th>CeCo</th><th>DM</th><th>Región</th><th>Salidas</th><th>Ingresos</th><th>Monto salida</th><th>Monto ingreso</th><th>Diferencia</th><th>Estado</th></tr></thead><tbody id="summaryRows"></tbody></table></div></article>
       </section>
 
-      <section class="content-section" data-view="analysis">
-        <div class="two-column">
-          <article class="card chart-card"><div class="card-header"><div><p class="eyebrow">Regiones</p><h3>Participación por región</h3></div></div><canvas id="regionChart" height="240"></canvas></article>
-          <article class="card chart-card"><div class="card-header"><div><p class="eyebrow">Ingredientes</p><h3>Top ingredientes críticos</h3></div></div><div id="topIngredients" class="rank-list"></div></article>
-        </div>
-        <article class="card full-card"><div class="card-header"><div><p class="eyebrow">Rutas</p><h3>Principales rutas tienda → proveedor</h3></div></div><div id="topRoutes" class="route-grid"></div></article>
+      <section class="content-section" data-view="auditoria">
+        <article class="card full-card"><div class="card-header"><div><p class="eyebrow">Auditoría</p><h3>Resumen por tienda</h3></div><span class="badge" id="auditBadge"></span></div><div class="table-wrap"><table><thead><tr><th>Tienda</th><th>CeCo</th><th>DM</th><th>Región</th><th>Salidas</th><th>Ingresos</th><th>Monto salida</th><th>Monto ingreso</th><th>Diferencia</th><th>Estado</th></tr></thead><tbody id="auditRows"></tbody></table></div></article>
       </section>
 
-      <section class="content-section" data-view="movements">
-        <article class="card full-card">
-          <div class="card-header"><div><p class="eyebrow">Detalle operativo</p><h3>Últimos movimientos filtrados</h3></div><span class="badge" id="tableBadge"></span></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Fecha</th><th>Semana</th><th>CeCo</th><th>Tienda</th><th>Ingrediente</th><th>Proveedor</th><th>Cantidad</th><th>Costo total</th></tr></thead>
-              <tbody id="movementRows"></tbody>
-            </table>
-          </div>
-        </article>
+      <section class="content-section" data-view="transferencias">
+        <article class="card full-card"><div class="card-header"><div><p class="eyebrow">Detalle</p><h3 id="detailTitle">Detalle básico por producto</h3></div><span class="badge" id="detailBadge"></span></div><div class="table-wrap"><table><thead><tr><th>Fecha salida</th><th>Tienda</th><th>Destino</th><th>Ingrediente</th><th>Cantidad salida</th><th>Cantidad ingreso</th><th>Costo unitario</th><th>Total salida</th><th>Total ingreso</th><th>Diferencia</th><th>Estado</th></tr></thead><tbody id="detailRows"></tbody></table></div></article>
       </section>
 
-      <section class="content-section" data-view="quality">
-        <div class="two-column">
-          <article class="card"><div class="card-header"><div><p class="eyebrow">Integridad</p><h3>Auditoría de datos</h3></div></div><div id="qualityList" class="quality-list"></div></article>
-          <article class="card"><div class="card-header"><div><p class="eyebrow">Producción</p><h3>Compatibilidad</h3></div></div><div class="compat-grid" id="compatGrid"></div></article>
-        </div>
+      <section class="content-section" data-view="alertas">
+        <article class="card full-card"><div class="card-header"><div><p class="eyebrow">Alertas</p><h3>Salidas que requieren atención</h3></div><span class="badge" id="alertBadge"></span></div><div id="alertList" class="alert-list"></div></article>
+      </section>
+
+      <section class="content-section" data-view="directorio">
+        <article class="card full-card"><div class="card-header"><div><p class="eyebrow">Directorio</p><h3>CeCo, tienda, región y DM</h3></div><span class="badge" id="directoryBadge"></span></div><div class="table-wrap"><table><thead><tr><th>CeCo</th><th>Tienda</th><th>Región</th><th>DM</th></tr></thead><tbody id="directoryRows"></tbody></table></div></article>
+      </section>
+
+      <section class="content-section" data-view="configuracion">
+        <article class="card full-card"><div class="card-header"><div><p class="eyebrow">Configuración</p><h3>Reglas aplicadas</h3></div></div><div class="rule-grid"><div><strong>Salida</strong><span>Cantidad negativa y costo total negativo.</span></div><div><strong>Ingreso</strong><span>Cantidad positiva y costo total positivo.</span></div><div><strong>Non Inventory</strong><span>Excluido de la revisión principal.</span></div><div><strong>Coffee Patrol</strong><span>Excepción válida. No exige ingreso.</span></div></div></article>
       </section>
     </main>
   </div>

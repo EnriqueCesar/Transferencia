@@ -1,115 +1,109 @@
 # Transferencias Starbucks México
 
-Versión: `v1.1-github-ready-data-split`
+## Versión
 
-Dashboard corporativo PWA para análisis de transferencias Starbucks México, ajustado para GitHub y GitHub Pages sin archivos mayores a 20 MB.
+`v2-auditoria-basica-operativa`
 
-## Motivo del ajuste
+## Objetivo
 
-La versión anterior incluía archivos de data monolíticos mayores a 20 MB. Esta versión divide la información en chunks JSON mensuales y carga la data bajo demanda desde el navegador.
+V2 sencilla y operativa para revisar transferencias entre tiendas. La versión conserva PWA, GitHub Pages, diseño Corporate Monoline Sidebar y carga por chunks, pero simplifica la experiencia para auditoría diaria.
+
+## Cambios realizados
+
+- Se ocultó el apartado Calidad de menú, tarjetas y navegación.
+- Se retiraron mensajes técnicos visibles para el usuario.
+- Se retiraron filtros Desde y Hasta.
+- Se eliminó exportación CSV.
+- Se agregó filtro Mes y se corrigió Semana con orden numérico ascendente.
+- Se implementaron filtros dependientes Región → DM → Tienda.
+- Se regeneró la data desde `Base_Transferencias.xlsx`.
+- Se excluyeron ingredientes marcados como `Non Inventory` de la auditoría principal.
+- Se agregó auditoría básica Salida vs Ingreso.
+- Se respetó el caso especial `38100 SBUX Coffee_Patrol` como excepción válida.
 
 ## Fuente de datos
 
-- Archivo fuente usado: `Base_Transferencias.xlsx`
+- Archivo fuente: `Base_Transferencias.xlsx`
 - Hoja principal: `Compras_Transferencias`
-- Hoja directorio: `Base_Directorio`
-- Hoja de referencia: `Instrucciones`
-- Periodo cargado: `2026-01-01` a `2026-07-05`
-- Registros válidos: `312,100`
-- Registros inválidos: `0`
-- Caso especial: `38100 SBUX Coffee_Patrol` se considera únicamente Salida.
+- Directorio: `Base_Directorio`
+- Exclusión inventario: `Non Inventory`
 
-## División de data
+## Reglas de auditoría
 
-```text
-data/
-  manifest-data.json
-  chunks/
-    transferencias-2026-01.json  (52,403 registros, 3.40 MB)
-    transferencias-2026-02.json  (45,813 registros, 2.98 MB)
-    transferencias-2026-03.json  (44,318 registros, 2.92 MB)
-    transferencias-2026-04.json  (52,715 registros, 3.48 MB)
-    transferencias-2026-05.json  (53,369 registros, 3.52 MB)
-    transferencias-2026-06.json  (53,815 registros, 3.53 MB)
-    transferencias-2026-07.json  (9,667 registros, 0.63 MB)
-```
+Salida:
 
-`manifest-data.json` contiene versión, rango, diccionarios, columnas internas, chunks disponibles, semanas, rango de fechas, cantidad de registros, peso aproximado y ruta de cada chunk.
+- Cantidad negativa
+- Costo Total negativo
 
-## Regla de peso
+Ingreso:
 
+- Cantidad positiva
+- Costo Total positivo
+
+La comparación básica valida:
+
+- Ingrediente
+- Unidad de medida
+- Tienda / Proveedor inverso por CeCo
+- Cantidad absoluta
+- Costo Unitario
+- Costo Total absoluto
+- Fecha
+
+Estados usados:
+
+- Correcto
+- Sin ingreso
+- Diferencia de monto
+- Diferencia de cantidad
+- Fecha diferente
+- Revisar
+- Excepción válida Coffee Patrol
+
+## Data y GitHub
+
+- Registros fuente leídos: 312,100
+- Registros incluidos en auditoría principal: 308,019
+- Registros Non Inventory excluidos: 849
+- Filas inválidas omitidas: 0
+- Filas en cero omitidas de auditoría: 3,232
+- Chunks generados: 7
+- Chunk más pesado: 3.46 MB
 - Ningún archivo final supera 20 MB.
-- Los chunks de data quedan por debajo de 5 MB cuando el volumen mensual lo permite.
-- El Excel fuente no forma parte del sitio publicado.
-- El ZIP original no forma parte del proyecto final.
-- El Service Worker no precachea chunks de data grandes; solo cachea el app shell y el índice mínimo.
-
-## Estructura
-
-```text
-assets/
-  icons/
-  images/
-css/
-  styles.css
-js/
-  app.js
-data/
-  manifest-data.json
-  chunks/
-docs/
-  file-audit.json
-index.html
-manifest.json
-service-worker.js
-README.md
-```
-
-## Funcionalidades
-
-- Dashboard ejecutivo con KPIs.
-- Sidebar Navigation estilo Corporate Monoline.
-- Filtros por región, DM, tienda, ingrediente, semana, flujo y fecha.
-- Carga progresiva por chunks según rango de fechas y semana.
-- Búsqueda por tienda, ingrediente, proveedor, región, DM o CeCo.
-- Análisis por día, región, tienda, ingrediente y ruta tienda → proveedor.
-- Tabla operativa de últimos movimientos filtrados.
-- Exportación CSV filtrada desde navegador.
-- PWA con manifest, service worker y modo offline básico.
-- Compatible con GitHub Pages mediante rutas relativas.
-
-## Validaciones de negocio conservadas
-
-- Tienda desde columna F de `Compras_Transferencias`.
-- Proveedor desde columna I.
-- Cruce `CeCo` contra `Base_Directorio` para Región y DM.
-- Ingrediente, Cantidad, Costo Unitario, Costo Total, Fecha, CeCo, Región y DM integrados.
-- Cantidad positiva = Ingreso.
-- Cantidad negativa = Salida.
-- Costo Unitario siempre positivo.
-- Costo Total positivo = Ingreso.
-- Costo Total negativo = Salida.
-- `38100 SBUX Coffee_Patrol` se considera solo Salida.
+- No se incluye el Excel original.
+- No se incluye el ZIP original.
 
 ## Despliegue en GitHub Pages
 
-1. Subir el contenido completo de esta carpeta al repositorio.
-2. No subir el Excel fuente ni el ZIP original.
-3. Activar GitHub Pages desde `Settings > Pages`.
-4. Seleccionar rama y carpeta raíz.
-5. Publicar.
+1. Subir el contenido de esta carpeta al repositorio.
+2. Activar GitHub Pages desde la rama principal.
+3. Usar la raíz del repositorio como carpeta publicada.
+4. Abrir `index.html` desde la URL de GitHub Pages.
 
-No requiere build, Node.js ni dependencias externas.
+## PWA
+
+Incluye:
+
+- `manifest.json`
+- `service-worker.js`
+- iconos SVG
+- cache del app shell
+- carga de chunks bajo demanda sin cachear archivos grandes de data
 
 ## Validaciones realizadas
 
-- Proyecto reestructurado sin archivos mayores a 20 MB.
-- Data regenerada y contrastada contra la estructura del workbook `Base_Transferencias.xlsx`.
-- Data dividida en chunks JSON mensuales.
-- `manifest-data.json` generado correctamente.
-- `app.js` ajustado para carga bajo demanda.
-- Service Worker ajustado para no precachear chunks grandes.
-- Manifest PWA actualizado.
-- Rutas relativas validadas para GitHub Pages.
-- Sintaxis JavaScript validada con Node.js.
-- ZIP final generado sin incluir fuentes pesadas.
+- Proyecto estructurado con `index.html`, `css/styles.css`, `js/app.js`, `manifest.json`, `service-worker.js`, `assets` y `data`.
+- Sintaxis JavaScript validada con Node.
+- Manifest de data JSON validado.
+- Chunks JSON validados.
+- Ningún archivo final supera 20 MB.
+- No existen archivos ZIP, XLSX ni temporales dentro del entregable final.
+- La palabra Calidad no aparece en la interfaz HTML.
+- Filtros Desde y Hasta no aparecen en la interfaz HTML.
+- Exportación CSV no aparece en la interfaz HTML ni en `app.js`.
+- Semana queda ordenada numéricamente desde `manifest-data.json` y `app.js`.
+- Mes queda ordenado de enero a diciembre desde `app.js`.
+- Región filtra DM y DM filtra Tienda desde `app.js`.
+- Non Inventory queda excluido de los chunks usados por la auditoría principal.
+- Coffee Patrol queda tratado como excepción válida en `app.js`.
+

@@ -1,7 +1,7 @@
 {
   "name": "Transferencias Starbucks México",
   "short_name": "Transferencias",
-  "description": "Dashboard PWA de transferencias con data dividida para GitHub Pages.",
+  "description": "Auditoría operativa de transferencias entre tiendas.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
