@@ -1,0 +1,132 @@
+{
+  "version": "v1.1-github-ready-data-split",
+  "limitBytes": 20971520,
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 3975,
+      "mb": 0.0038,
+      "over20MB": false,
+      "sha256": "d9663df9f2e96059"
+    },
+    {
+      "path": "assets/icons/icon-192.svg",
+      "bytes": 420,
+      "mb": 0.0004,
+      "over20MB": false,
+      "sha256": "d3bb0f659b1d0515"
+    },
+    {
+      "path": "assets/icons/icon-512.svg",
+      "bytes": 420,
+      "mb": 0.0004,
+      "over20MB": false,
+      "sha256": "d3bb0f659b1d0515"
+    },
+    {
+      "path": "assets/icons/icon.svg",
+      "bytes": 420,
+      "mb": 0.0004,
+      "over20MB": false,
+      "sha256": "d3bb0f659b1d0515"
+    },
+    {
+      "path": "assets/images/transferencia.png",
+      "bytes": 1038031,
+      "mb": 0.9899,
+      "over20MB": false,
+      "sha256": "439076b283a0cbbb"
+    },
+    {
+      "path": "css/styles.css",
+      "bytes": 8003,
+      "mb": 0.0076,
+      "over20MB": false,
+      "sha256": "ae4c465233a239b4"
+    },
+    {
+      "path": "data/chunks/transferencias-2026-01.json",
+      "bytes": 3570264,
+      "mb": 3.4049,
+      "over20MB": false,
+      "sha256": "8911d4621def8b82"
+    },
+    {
+      "path": "data/chunks/transferencias-2026-02.json",
+      "bytes": 3123587,
+      "mb": 2.9789,
+      "over20MB": false,
+      "sha256": "d8848305007ceb97"
+    },
+    {
+      "path": "data/chunks/transferencias-2026-03.json",
+      "bytes": 3065673,
+      "mb": 2.9237,
+      "over20MB": false,
+      "sha256": "b7c6930aa561d3a2"
+    },
+    {
+      "path": "data/chunks/transferencias-2026-04.json",
+      "bytes": 3651937,
+      "mb": 3.4828,
+      "over20MB": false,
+      "sha256": "51e3e009c037cc56"
+    },
+    {
+      "path": "data/chunks/transferencias-2026-05.json",
+      "bytes": 3689605,
+      "mb": 3.5187,
+      "over20MB": false,
+      "sha256": "c4ecd4a344268bf2"
+    },
+    {
+      "path": "data/chunks/transferencias-2026-06.json",
+      "bytes": 3705801,
+      "mb": 3.5341,
+      "over20MB": false,
+      "sha256": "b321910a38ec1148"
+    },
+    {
+      "path": "data/chunks/transferencias-2026-07.json",
+      "bytes": 665647,
+      "mb": 0.6348,
+      "over20MB": false,
+      "sha256": "d448f57a11878251"
+    },
+    {
+      "path": "data/manifest-data.json",
+      "bytes": 92555,
+      "mb": 0.0883,
+      "over20MB": false,
+      "sha256": "e7dee9d80b5e7aac"
+    },
+    {
+      "path": "index.html",
+      "bytes": 7437,
+      "mb": 0.0071,
+      "over20MB": false,
+      "sha256": "43abeaaf3bf1c514"
+    },
+    {
+      "path": "js/app.js",
+      "bytes": 15443,
+      "mb": 0.0147,
+      "over20MB": false,
+      "sha256": "b96065c32fae2f63"
+    },
+    {
+      "path": "manifest.json",
+      "bytes": 626,
+      "mb": 0.0006,
+      "over20MB": false,
+      "sha256": "e1f61fdf7e81310e"
+    },
+    {
+      "path": "service-worker.js",
+      "bytes": 1214,
+      "mb": 0.0012,
+      "over20MB": false,
+      "sha256": "c62324262b83235f"
+    }
+  ]
+}
