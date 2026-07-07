@@ -1,7 +1,7 @@
 {
-  "name": "Transferencias Starbucks México",
+  "name": "Transferencias Starbucks | Auditoría",
   "short_name": "Transferencias",
-  "description": "Auditoría operativa de transferencias entre tiendas.",
+  "description": "Auditoría operativa de transferencias entre tiendas Starbucks México.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

@@ -2,108 +2,85 @@
 
 ## Versión
 
-`v2-auditoria-basica-operativa`
+`v3-auditoria-transferencias`
 
 ## Objetivo
 
-V2 sencilla y operativa para revisar transferencias entre tiendas. La versión conserva PWA, GitHub Pages, diseño Corporate Monoline Sidebar y carga por chunks, pero simplifica la experiencia para auditoría diaria.
+Simplificar la auditoría operativa para que un DM o Auditor revise transferencias completas entre tiendas: primero se muestra el movimiento de tienda origen hacia proveedor destino y después el detalle de productos.
 
-## Cambios realizados
+## Cambios principales
 
-- Se ocultó el apartado Calidad de menú, tarjetas y navegación.
-- Se retiraron mensajes técnicos visibles para el usuario.
-- Se retiraron filtros Desde y Hasta.
-- Se eliminó exportación CSV.
-- Se agregó filtro Mes y se corrigió Semana con orden numérico ascendente.
-- Se implementaron filtros dependientes Región → DM → Tienda.
-- Se regeneró la data desde `Base_Transferencias.xlsx`.
-- Se excluyeron ingredientes marcados como `Non Inventory` de la auditoría principal.
-- Se agregó auditoría básica Salida vs Ingreso.
-- Se respetó el caso especial `38100 SBUX Coffee_Patrol` como excepción válida.
+- Menú lateral simplificado: Inicio, Auditoría, Transferencias y Alertas.
+- Directorio y Configuración ocultos visualmente sin eliminar lógica base.
+- Dashboard ajustado a nivel transferencia, no ingrediente.
+- Transferencia definida como: Fecha + Tienda origen + Proveedor destino.
+- Cada tarjeta de Transferencias agrupa varios productos de un mismo movimiento.
+- Detalle por producto disponible al seleccionar una transferencia.
+- Fecha visual en formato corto: `04 Jul`.
+- Filtro `Ocultar Coffee Patrol` activado por defecto.
+- Coffee Patrol se conserva como movimiento informativo y no exige ingreso.
+- El filtro Tienda analiza salidas de la tienda seleccionada desde Compras_Transferencias.
+- Región y DM continúan alimentándose desde Base_Directorio.
+- Carga por chunks conservada.
+- PWA y compatibilidad con GitHub Pages conservadas.
 
 ## Fuente de datos
 
 - Archivo fuente: `Base_Transferencias.xlsx`
-- Hoja principal: `Compras_Transferencias`
-- Directorio: `Base_Directorio`
-- Exclusión inventario: `Non Inventory`
+- Base principal: `Compras_Transferencias`
+- Cruce organizacional: `Base_Directorio`
+- Exclusión de auditoría principal: `Non Inventory`
 
 ## Reglas de auditoría
 
-Salida:
+- La auditoría inicia desde salidas.
+- Salida: cantidad negativa y costo total negativo.
+- Ingreso: cantidad positiva y costo total positivo.
+- Match inverso: tienda origen contra proveedor destino, y tienda destino contra proveedor origen.
+- Validación por producto: ingrediente, unidad, cantidad absoluta, costo unitario y costo total absoluto.
+- Si hay ingreso en otra fecha, se clasifica como `Ingreso con fecha diferente`.
+- Si no hay ingreso relacionado, se clasifica como `Sin ingreso`.
+- Si cambian cantidad o costo, se clasifica como diferencia operativa.
+- `38100 SBUX Coffee_Patrol` se clasifica como `Coffee Patrol` y no exige ingreso.
 
-- Cantidad negativa
-- Costo Total negativo
+## Estructura
 
-Ingreso:
+```text
+/assets
+/assets/icons
+/assets/images
+/css
+/data
+/data/chunks
+/js
+index.html
+manifest.json
+service-worker.js
+README.md
+```
 
-- Cantidad positiva
-- Costo Total positivo
+## Validaciones realizadas
 
-La comparación básica valida:
-
-- Ingrediente
-- Unidad de medida
-- Tienda / Proveedor inverso por CeCo
-- Cantidad absoluta
-- Costo Unitario
-- Costo Total absoluto
-- Fecha
-
-Estados usados:
-
-- Correcto
-- Sin ingreso
-- Diferencia de monto
-- Diferencia de cantidad
-- Fecha diferente
-- Revisar
-- Excepción válida Coffee Patrol
-
-## Data y GitHub
-
-- Registros fuente leídos: 312,100
-- Registros incluidos en auditoría principal: 308,019
-- Registros Non Inventory excluidos: 849
-- Filas inválidas omitidas: 0
-- Filas en cero omitidas de auditoría: 3,232
-- Chunks generados: 7
-- Chunk más pesado: 3.46 MB
+- Proyecto empaquetado sin ZIP ni Excel fuente dentro de la versión final.
 - Ningún archivo final supera 20 MB.
-- No se incluye el Excel original.
-- No se incluye el ZIP original.
+- Manifest de datos conservado y actualizado a V3.
+- Chunks de datos conservados bajo demanda.
+- Directorio y Configuración no aparecen en el menú lateral.
+- La interfaz no muestra textos técnicos de chunks, PWA o versión.
+- Exportación CSV no aparece.
+- Formato de fecha corto implementado en tarjetas y alertas.
+- Transferencias agrupadas por Fecha + Tienda origen + Proveedor destino.
+- Detalle por producto implementado por transferencia seleccionada.
+- Filtro Tienda aplicado sobre salidas de Compras_Transferencias.
+- Filtros Región y DM conservan cruce desde Base_Directorio.
+- Coffee Patrol queda oculto por defecto y puede mostrarse como informativo.
+- Sintaxis JavaScript validada.
+- Service Worker actualizado sin cachear chunks pesados.
 
 ## Despliegue en GitHub Pages
 
 1. Subir el contenido de esta carpeta al repositorio.
-2. Activar GitHub Pages desde la rama principal.
-3. Usar la raíz del repositorio como carpeta publicada.
-4. Abrir `index.html` desde la URL de GitHub Pages.
+2. Activar GitHub Pages desde la rama publicada.
+3. Abrir `index.html` desde la URL generada por GitHub Pages.
 
-## PWA
-
-Incluye:
-
-- `manifest.json`
-- `service-worker.js`
-- iconos SVG
-- cache del app shell
-- carga de chunks bajo demanda sin cachear archivos grandes de data
-
-## Validaciones realizadas
-
-- Proyecto estructurado con `index.html`, `css/styles.css`, `js/app.js`, `manifest.json`, `service-worker.js`, `assets` y `data`.
-- Sintaxis JavaScript validada con Node.
-- Manifest de data JSON validado.
-- Chunks JSON validados.
-- Ningún archivo final supera 20 MB.
-- No existen archivos ZIP, XLSX ni temporales dentro del entregable final.
-- La palabra Calidad no aparece en la interfaz HTML.
-- Filtros Desde y Hasta no aparecen en la interfaz HTML.
-- Exportación CSV no aparece en la interfaz HTML ni en `app.js`.
-- Semana queda ordenada numéricamente desde `manifest-data.json` y `app.js`.
-- Mes queda ordenado de enero a diciembre desde `app.js`.
-- Región filtra DM y DM filtra Tienda desde `app.js`.
-- Non Inventory queda excluido de los chunks usados por la auditoría principal.
-- Coffee Patrol queda tratado como excepción válida en `app.js`.
-
+No se requiere servidor ni procesamiento adicional.
