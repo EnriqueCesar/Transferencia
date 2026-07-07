@@ -1,115 +1,129 @@
-# Transferencias Starbucks México
+# Transferencias Starbucks
 
 ## Versión
 
-`v4-calibracion-operativa-transferencias`
+`v5-auditoria-inteligente-transferencias`
 
 ## Objetivo
 
-Versión enfocada en calibrar la lectura, agrupación y validación operativa de transferencias para que la auditoría revise correctamente el año completo desde la base real de movimientos.
+Tablero operativo para conciliar transferencias entre tiendas Starbucks, agrupando miles de movimientos en transferencias completas y mostrando primero las excepciones que requieren atención.
 
 ## Fuente de datos
 
-- Archivo fuente: `Base_Transferencias.xlsx`
-- Hoja principal: `Compras_Transferencias`
-- Directorio: `Base_Directorio`
-- Exclusión operativa: `Non Inventory`
+Archivo fuente utilizado: `Base_Transferencias.xlsx`.
 
-## Uso de la data
+La auditoría se genera únicamente desde la pestaña `Compras_Transferencias`, leyendo columnas por encabezado y no por posición física.
 
-La auditoría principal se genera desde `Compras_Transferencias`.
+Encabezados esperados:
 
-Columnas usadas:
-
-- `CeCo`
-- `Tienda`
-- `Ingrediente`
-- `Proveedor`
-- `Cantidad`
-- `Costo Unitario`
-- `Costo Total`
-
-`Base_Directorio` solo se usa para cruzar `CeCo` y obtener `Región` y `DM`.
-
-## Agrupación de transferencias
-
-Una transferencia se agrupa por:
-
-- Día
-- Tienda origen
-- Proveedor destino
-
-Varios ingredientes dentro del mismo día, tienda origen y proveedor destino se muestran como una sola transferencia con detalle de productos.
-
-## Auditoría Salida vs Ingreso
-
-La revisión inicia desde salidas:
-
-- Cantidad negativa
-- Costo Total negativo
-
-Después busca el ingreso inverso:
-
-- Cantidad positiva
-- Costo Total positivo
-
-Criterios de match:
-
-- CeCo destino contra CeCo del ingreso
-- Proveedor del ingreso contra CeCo de tienda origen
+- Año
+- Semana
+- Dia
+- Tipo Operación
+- CeCo
+- Tienda
 - Ingrediente
-- Unidad
-- Cantidad absoluta
-- Costo unitario
-- Costo total absoluto
-- Fecha
+- Unidad de Medida
+- Proveedor
+- Cantidad
+- Costo Unitario
+- Costo Total
 
-## Estados
+## Base_Directorio
 
-- Correcta
-- Ingreso encontrado
-- Ingreso con fecha diferente
-- Sin ingreso
-- Diferencia de cantidad
-- Diferencia de costo
-- Coffee Patrol
-- Revisar
+`Base_Directorio` se usa solo para enriquecer datos por `CeCo` y obtener:
 
-## Coffee Patrol
+- Región
+- DM
 
-`38100 SBUX Coffee_Patrol` se mantiene como movimiento informativo. No exige ingreso y puede ocultarse con el filtro de la interfaz.
+Las tiendas del filtro se obtienen desde `Compras_Transferencias`, no desde `Base_Directorio`.
 
 ## Non Inventory
 
-Los ingredientes marcados como `Non Inventory` se excluyen de la auditoría principal. No se eliminan de la fuente, solo quedan fuera del análisis operativo.
+Los ingredientes marcados como `Non Inventory` se excluyen de la conciliación operativa principal. Los datos no se eliminan del archivo fuente; únicamente no participan en la auditoría.
 
-## Carga de datos
+## Lógica de auditoría
 
-La data se divide en chunks mensuales dentro de `/data/chunks` y se indexa en `/data/manifest-data.json`.
+Una transferencia se define por:
 
-Ningún archivo final supera 20 MB.
+- Año
+- Semana
+- Día
+- Tienda origen
+- Tienda destino
+
+La auditoría inicia desde salidas (`Cantidad < 0` y `Costo Total < 0`) y busca la entrada inversa (`Cantidad > 0` y `Costo Total > 0`).
+
+Validaciones aplicadas:
+
+- Ingrediente
+- Unidad de medida
+- Cantidad absoluta
+- Costo unitario
+- Costo total absoluto
+- Tienda origen
+- Tienda destino
+- Proveedor inverso
+
+Estados principales:
+
+- Conciliada
+- Falta Entrada
+- Falta Salida
+- Diferencia de Cantidad
+- Diferencia de Costo
+- Ingredientes Incompletos
+- Transferencia Parcial
+- Revisar
+- Coffee Patrol
+
+## Coffee Patrol
+
+`38100 SBUX Coffee_Patrol` se mantiene como excepción informativa. No exige entrada y no contamina los pendientes operativos cuando el filtro de ocultar Coffee Patrol está activo.
+
+## Filtros
+
+Filtros disponibles:
+
+- Año
+- Mes
+- Semana
+- Región
+- DM
+- Tienda
+- Proveedor
+- Ingrediente
+- Estado
+- Entrada / Salida
+- Búsqueda
+- Ocultar Coffee Patrol
+
+El filtro de tienda es bidireccional: muestra transferencias enviadas y recibidas relacionadas con la tienda seleccionada.
+
+## Data por chunks
+
+La data se mantiene dividida en chunks mensuales dentro de `/data/chunks` y se carga bajo demanda a partir de `/data/manifest-data.json`.
+
+Ningún archivo del proyecto final supera 20 MB.
 
 ## Compatibilidad
 
-- GitHub Pages compatible
-- PWA conservada
-- Service Worker actualizado
-- Rutas relativas
-- Sin Excel ni ZIP fuente dentro del proyecto final
+- Compatible con GitHub Pages.
+- PWA conservada.
+- Service Worker actualizado.
+- No se incluyen el Excel fuente, ZIP original ni archivos temporales.
 
 ## Validaciones realizadas
 
 - Proyecto empaquetado correctamente.
-- `Compras_Transferencias` usada como origen principal.
-- `Base_Directorio` usada solo para Región y DM.
 - Data regenerada desde `Base_Transferencias.xlsx`.
-- Chunks mensuales generados.
-- Ningún archivo supera 20 MB.
-- Filtro Tienda construido desde `Compras_Transferencias`.
-- Estado `Todos` deja visible toda la auditoría filtrada.
-- Transferencias agrupadas por Día + Tienda origen + Proveedor destino.
-- Detalle por producto disponible dentro de cada transferencia.
+- `Compras_Transferencias` usada como fuente principal por encabezados.
+- `Base_Directorio` usada solo para Región y DM.
 - Non Inventory excluido de auditoría principal.
-- Coffee Patrol tratado como informativo.
-- Sintaxis JS validada.
-- Service Worker actualizado para V4.
+- Transferencias agrupadas por Año + Semana + Día + Origen + Destino.
+- Filtro tienda funciona en ambos sentidos desde la auditoría agrupada.
+- Se agregó filtro Entrada / Salida.
+- Coffee Patrol se mantiene como excepción informativa.
+- Carga por chunks conservada.
+- PWA y rutas relativas compatibles con GitHub Pages.
+- Ningún archivo final supera 20 MB.
