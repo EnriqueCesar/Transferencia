@@ -4,29 +4,21 @@ const DATA_MANIFEST_URL='data/manifest-data.json';
 const idx={year:0,week:1,date:2,ceco:3,store:4,ingredient:5,unit:6,provider:7,quantity:8,unitCost:9,totalCost:10,region:11,dm:12};
 const monthNames=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const auditStates=['Correcta','Ingreso encontrado','Ingreso con fecha diferente','Sin ingreso','Diferencia de cantidad','Diferencia de costo','Coffee Patrol','Revisar'];
-const state={manifest:null,loadedChunks:new Map(),month:'',week:'',region:'',dm:'',store:'',ingredient:'',provider:'',status:'',search:'',hideCoffee:true,view:'inicio',selectedTransfer:'',transfers:[],summary:[]};
+const state={manifest:null,loadedChunks:new Map(),month:'',week:'',region:'',dm:'',store:'',ingredient:'',provider:'',status:'',search:'',hideCoffee:true,view:'inicio',selectedTransfer:'',transfers:[],summary:[],allRows:[]};
 const el=id=>document.getElementById(id);
 const money=new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:2});
 const qtyFmt=new Intl.NumberFormat('es-MX',{maximumFractionDigits:2});
 const intFmt=new Intl.NumberFormat('es-MX',{maximumFractionDigits:0});
-function peso(n){return money.format(Number(n)||0);} function qty(n){return qtyFmt.format(Number(n)||0);} function count(n){return intFmt.format(Number(n)||0);} 
+function peso(n){return money.format(Number(n)||0);} function qty(n){return qtyFmt.format(Number(n)||0);} function count(n){return intFmt.format(Number(n)||0);}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function debounce(fn,delay){let t;return(...args)=>{clearTimeout(t);t=setTimeout(()=>fn(...args),delay);};}
 function setMessage(msg){el('friendlyStatus').textContent=msg;} function setCount(msg){el('filterCount').textContent=msg;}
-const decode={
-  store:r=>state.manifest.dicts.tienda[r[idx.store]]||'',
-  ingredient:r=>state.manifest.dicts.ingrediente[r[idx.ingredient]]||'',
-  unit:r=>state.manifest.dicts.unidad[r[idx.unit]]||'',
-  provider:r=>state.manifest.dicts.proveedor[r[idx.provider]]||'',
-  region:r=>state.manifest.dicts.region[r[idx.region]]||'',
-  dm:r=>state.manifest.dicts.dm[r[idx.dm]]||''
-};
+const decode={store:r=>state.manifest.dicts.tienda[r[idx.store]]||'',ingredient:r=>state.manifest.dicts.ingrediente[r[idx.ingredient]]||'',unit:r=>state.manifest.dicts.unidad[r[idx.unit]]||'',provider:r=>state.manifest.dicts.proveedor[r[idx.provider]]||'',region:r=>state.manifest.dicts.region[r[idx.region]]||'',dm:r=>state.manifest.dicts.dm[r[idx.dm]]||''};
 function normalize(v){return String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();}
 function parseProviderCeco(provider){const m=String(provider||'').match(/^(\d{4,6})\b/);return m?m[1]:'';}
-function cleanProviderName(provider){return String(provider||'').replace(/^\d{4,6}\s*SBUX\s*/i,'').replace(/_/g,' ').trim();}
+function cleanProviderName(provider){return String(provider||'').replace(/^\d{4,6}\s*SBUX\s*/i,'').replace(/_/g,' ').replace(/\s+/g,' ').trim();}
 function shortDate(iso){const d=new Date(`${iso}T00:00:00`); if(Number.isNaN(d.getTime()))return iso; return `${String(d.getDate()).padStart(2,'0')} ${monthNames[d.getMonth()].slice(0,3)}`;}
 function directionLabel(t){return `${t.originStore} → ${t.destinationStore}`;}
-function directoryByCeco(){const map=new Map(); for(const d of state.manifest.directory||[])map.set(String(d.ceco),d); return map;}
 function isCoffeeProvider(provider){return /^38100\b/i.test(String(provider||''))||/coffee[_\s-]*patrol/i.test(String(provider||''));}
 function closeAbs(a,b,tol=0.02){return Math.abs(Math.abs(Number(a)||0)-Math.abs(Number(b)||0))<=tol;}
 function closeUnit(a,b,tol=0.02){return Math.abs((Number(a)||0)-(Number(b)||0))<=tol;}
@@ -63,10 +55,6 @@ function chunksForCurrentFilters(){
   let chunks=(state.manifest.chunks||[]).slice();
   if(state.month)chunks=chunks.filter(c=>String(c.month)===String(state.month));
   if(state.week)chunks=chunks.filter(c=>(c.weeks||[]).map(String).includes(String(state.week)));
-  if(!state.month&&!state.week){
-    const latest=(state.manifest.chunks||[]).slice().sort((a,b)=>(b.year-a.year)||(b.month-a.month))[0];
-    chunks=latest?[latest]:[];
-  }
   return chunks;
 }
 async function loadChunks(chunks){
@@ -90,17 +78,18 @@ function rowMatchesText(r){
 }
 function rowPassesSalidaFilters(r){return rowMatchesTime(r)&&rowMatchesOrg(r)&&rowMatchesText(r);}
 function updateDependentFilters(rows){
-  const directory=state.manifest.directory||[];
-  const dms=[...new Set(directory.filter(d=>!state.region||d.region===state.region).map(d=>d.dm).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).map(v=>({value:v,label:v}));
+  const timeRows=rows.filter(rowMatchesTime);
+  const regionDms=new Set(timeRows.filter(r=>!state.region||decode.region(r)===state.region).map(decode.dm).filter(Boolean));
+  const dms=[...regionDms].sort((a,b)=>a.localeCompare(b,'es')).map(v=>({value:v,label:v}));
   if(state.dm&&!dms.some(d=>d.value===state.dm))state.dm='';
   fillSelect(el('dmFilter'),dms,state.dm,'Todos');
-  const storeRows=rows.filter(r=>rowMatchesTime(r)&&(!state.region||decode.region(r)===state.region)&&(!state.dm||decode.dm(r)===state.dm));
+  const storeRows=timeRows.filter(r=>(!state.region||decode.region(r)===state.region)&&(!state.dm||decode.dm(r)===state.dm));
   const stores=[...new Set(storeRows.map(decode.store).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).map(v=>({value:v,label:v}));
   if(state.store&&!stores.some(s=>s.value===state.store))state.store='';
   fillSelect(el('storeFilter'),stores,state.store,'Todas');
-  const visibleRows=rows.filter(r=>rowMatchesTime(r)&&rowMatchesOrg(r));
-  const ingredients=[...new Set(visibleRows.map(decode.ingredient).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).slice(0,1200).map(v=>({value:v,label:v}));
-  const providers=[...new Set(visibleRows.map(decode.provider).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).slice(0,1200).map(v=>({value:v,label:v}));
+  const visibleRows=timeRows.filter(r=>rowMatchesOrg(r));
+  const ingredients=[...new Set(visibleRows.map(decode.ingredient).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).slice(0,1600).map(v=>({value:v,label:v}));
+  const providers=[...new Set(visibleRows.map(decode.provider).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).slice(0,1600).map(v=>({value:v,label:v}));
   if(state.ingredient&&!ingredients.some(x=>x.value===state.ingredient))state.ingredient='';
   if(state.provider&&!providers.some(x=>x.value===state.provider))state.provider='';
   fillSelect(el('ingredientFilter'),ingredients,state.ingredient,'Todos'); fillSelect(el('providerFilter'),providers,state.provider,'Todos');
@@ -114,6 +103,7 @@ function makeInputIndex(rows){
     const key=[String(r[idx.ceco]),providerCeco,r[idx.ingredient],r[idx.unit]].join('|');
     if(!map.has(key))map.set(key,[]); map.get(key).push({row:r,used:false});
   }
+  for(const list of map.values())list.sort((a,b)=>a.row[idx.date].localeCompare(b.row[idx.date]));
   return map;
 }
 function compareProduct(salida,inputIndex){
@@ -131,6 +121,8 @@ function compareProduct(salida,inputIndex){
     if(!closeUnit(salida[idx.unitCost],r[idx.unitCost],0.02))s+=12;
     if(!closeAbs(salida[idx.totalCost],r[idx.totalCost],0.02))s+=20;
     if(salida[idx.date]!==r[idx.date])s+=1;
+    const days=Math.abs(new Date(`${salida[idx.date]}T00:00:00`)-new Date(`${r[idx.date]}T00:00:00`))/(86400000);
+    if(Number.isFinite(days))s+=Math.min(days,20)/20;
     if(s<score){score=s;best=c;}
   }
   if(!best)return {status:'Sin ingreso',ingreso:null,diff:Math.abs(Number(salida[idx.totalCost])||0),alert:'Esta salida aún no tiene ingreso relacionado.'};
@@ -153,21 +145,21 @@ function transferStatus(products){
   if(statuses.includes('Diferencia de costo'))return 'Diferencia de costo';
   if(statuses.includes('Revisar'))return 'Revisar';
   if(statuses.includes('Ingreso con fecha diferente'))return 'Ingreso con fecha diferente';
-  return products.some(p=>p.ingreso)?'Ingreso encontrado':'Correcta';
+  if(statuses.every(s=>s==='Correcta'))return 'Correcta';
+  return products.some(p=>p.ingreso)?'Ingreso encontrado':'Revisar';
 }
 function statusRank(s){return {'Sin ingreso':0,'Diferencia de cantidad':1,'Diferencia de costo':2,'Revisar':3,'Ingreso con fecha diferente':4,'Coffee Patrol':5,'Ingreso encontrado':6,'Correcta':7}[s]??9;}
 function buildAudit(rows){
   const inputIndex=makeInputIndex(rows);
-  const dir=directoryByCeco();
   const salidas=rows.filter(r=>Number(r[idx.quantity])<0&&Number(r[idx.totalCost])<0&&rowPassesSalidaFilters(r)).filter(r=>!state.hideCoffee||!isCoffeeProvider(decode.provider(r)));
   const groups=new Map();
   for(const s of salidas){
     const res=compareProduct(s,inputIndex);
     const provider=decode.provider(s);
     const destCeco=parseProviderCeco(provider);
-    const dest=(destCeco&&dir.get(destCeco))?dir.get(destCeco).tienda:cleanProviderName(provider);
+    const dest=cleanProviderName(provider)||provider;
     const key=[s[idx.date],s[idx.ceco],provider].join('|');
-    if(!groups.has(key))groups.set(key,{id:key,date:s[idx.date],originCeco:String(s[idx.ceco]),originStore:decode.store(s),region:decode.region(s),dm:decode.dm(s),provider,destCeco,destinationStore:dest||provider,products:[]});
+    if(!groups.has(key))groups.set(key,{id:key,date:s[idx.date],originCeco:String(s[idx.ceco]),originStore:decode.store(s),region:decode.region(s),dm:decode.dm(s),provider,destCeco,destinationStore:dest,products:[]});
     groups.get(key).products.push({salida:s,ingreso:res.ingreso,status:res.status,diff:res.diff,alert:res.alert});
   }
   let transfers=[...groups.values()].map(t=>{
@@ -179,7 +171,7 @@ function buildAudit(rows){
     t.status=transferStatus(t.products);
     return t;
   });
-  if(state.status)transfers=transfers.filter(t=>t.status===state.status || (state.status==='Ingreso encontrado'&&t.status==='Correcta'));
+  if(state.status)transfers=transfers.filter(t=>state.status==='Ingreso encontrado'?t.products.some(p=>p.ingreso):t.status===state.status);
   transfers.sort((a,b)=>statusRank(a.status)-statusRank(b.status)||b.diff-a.diff||a.date.localeCompare(b.date)||a.originStore.localeCompare(b.originStore,'es'));
   const byStore=new Map();
   for(const t of transfers){
@@ -197,7 +189,7 @@ async function apply(){
   try{
     setMessage('Preparando información...');
     const chunks=chunksForCurrentFilters(); await loadChunks(chunks);
-    const rows=currentRows(chunks); updateDependentFilters(rows);
+    const rows=currentRows(chunks); state.allRows=rows; updateDependentFilters(rows);
     const result=buildAudit(rows); state.transfers=result.transfers; state.summary=result.summary;
     if(state.selectedTransfer&&!state.transfers.some(t=>t.id===state.selectedTransfer))state.selectedTransfer='';
     renderAll();
@@ -216,13 +208,13 @@ function renderAll(){
   renderTransferCards(); renderDetails(); renderAlerts();
 }
 function renderSummary(id,summary){
-  el(id).innerHTML=summary.map(item=>`<tr class="clickable" data-store="${escapeHtml(item.store)}"><td><strong>${escapeHtml(item.store)}</strong></td><td>${escapeHtml(item.ceco)}</td><td>${escapeHtml(item.dm)}</td><td>${escapeHtml(item.region)}</td><td class="number">${count(item.transfers)}</td><td class="number positive">${count(item.correct)}</td><td class="number negative">${count(item.pending)}</td><td class="number negative">${peso(item.montoSalida)}</td><td class="number positive">${peso(item.montoIngreso)}</td><td class="number">${peso(item.diff)}</td><td><span class="status ${statusClass(item.status)}">${escapeHtml(item.status)}</span></td></tr>`).join('')||'<tr><td colspan="11">Selecciona filtros para iniciar la revisión.</td></tr>';
+  el(id).innerHTML=summary.map(item=>`<tr class="clickable" data-store="${escapeHtml(item.store)}"><td><strong>${escapeHtml(item.store)}</strong></td><td>${escapeHtml(item.ceco)}</td><td>${escapeHtml(item.region)}</td><td>${escapeHtml(item.dm)}</td><td class="number">${count(item.transfers)}</td><td class="number positive">${count(item.correct)}</td><td class="number negative">${count(item.pending)}</td><td class="number negative">${peso(item.montoSalida)}</td><td class="number positive">${peso(item.montoIngreso)}</td><td class="number">${peso(item.diff)}</td><td><span class="status ${statusClass(item.status)}">${escapeHtml(item.status)}</span></td></tr>`).join('')||'<tr><td colspan="11">Selecciona filtros para iniciar la revisión.</td></tr>';
   el(id).querySelectorAll('tr[data-store]').forEach(tr=>tr.addEventListener('click',()=>{state.store=tr.dataset.store; el('storeFilter').value=state.store; state.selectedTransfer=''; switchView('transferencias'); apply();}));
 }
 function renderTransferCards(){
   const selected=state.selectedTransfer;
   el('transferBadge').textContent=`${count(state.transfers.length)} transferencias`;
-  el('transferCards').innerHTML=state.transfers.slice(0,240).map(t=>`<button class="transfer-card ${selected===t.id?'is-selected':''}" data-id="${escapeHtml(t.id)}" type="button"><span class="transfer-date">${escapeHtml(shortDate(t.date))}</span><strong>${escapeHtml(t.originStore)}</strong><span class="transfer-arrow">↓</span><span>${escapeHtml(t.destinationStore)}</span><div class="transfer-meta"><span>${count(t.productCount)} productos</span><span>${peso(t.montoSalida)}</span></div><span class="status ${statusClass(t.status)}">${escapeHtml(t.status)}</span></button>`).join('')||'<p class="empty-state">No hay transferencias con los filtros actuales.</p>';
+  el('transferCards').innerHTML=state.transfers.slice(0,320).map(t=>`<button class="transfer-card ${selected===t.id?'is-selected':''}" data-id="${escapeHtml(t.id)}" type="button"><span class="transfer-date">${escapeHtml(shortDate(t.date))}</span><strong>${escapeHtml(t.originStore)}</strong><span class="transfer-arrow">↓</span><span>${escapeHtml(t.destinationStore)}</span><div class="transfer-meta"><span>${count(t.productCount)} productos</span><span>${peso(t.montoSalida)}</span></div><span class="status ${statusClass(t.status)}">${escapeHtml(t.status)}</span></button>`).join('')||'<p class="empty-state">No hay transferencias con los filtros actuales.</p>';
   el('transferCards').querySelectorAll('button[data-id]').forEach(btn=>btn.addEventListener('click',()=>{state.selectedTransfer=btn.dataset.id; renderTransferCards(); renderDetails();}));
 }
 function renderDetails(){
@@ -234,7 +226,7 @@ function renderDetails(){
   el('detailRows').innerHTML=t.products.map(p=>{const s=p.salida,i=p.ingreso;return `<tr><td><strong>${escapeHtml(decode.ingredient(s))}</strong></td><td>${escapeHtml(decode.unit(s))}</td><td class="number negative">${qty(s[idx.quantity])}</td><td class="number positive">${i?qty(i[idx.quantity]):'—'}</td><td class="number">${peso(s[idx.unitCost])}</td><td class="number negative">${peso(s[idx.totalCost])}</td><td class="number positive">${i?peso(i[idx.totalCost]):'—'}</td><td class="number">${peso(p.diff)}</td><td><span class="status ${statusClass(p.status)}">${escapeHtml(p.status)}</span></td></tr>`;}).join('');
 }
 function renderAlerts(){
-  const alerts=state.transfers.filter(t=>!['Correcta','Ingreso encontrado','Coffee Patrol'].includes(t.status)).slice(0,120);
+  const alerts=state.transfers.filter(t=>!['Correcta','Ingreso encontrado','Coffee Patrol'].includes(t.status)).slice(0,160);
   el('alertBadge').textContent=`${count(alerts.length)} alertas`;
   el('alertList').innerHTML=alerts.map(t=>`<div class="alert-item"><strong>${escapeHtml(t.status)}</strong><span>${escapeHtml(shortDate(t.date))} · ${escapeHtml(directionLabel(t))}</span><small>${count(t.productCount)} productos · ${peso(t.diff)} de diferencia</small></div>`).join('')||'<p class="empty-state">Transferencias revisadas sin diferencias relevantes.</p>';
 }

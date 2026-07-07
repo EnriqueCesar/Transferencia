@@ -2,85 +2,114 @@
 
 ## Versión
 
-`v3-auditoria-transferencias`
+`v4-calibracion-operativa-transferencias`
 
 ## Objetivo
 
-Simplificar la auditoría operativa para que un DM o Auditor revise transferencias completas entre tiendas: primero se muestra el movimiento de tienda origen hacia proveedor destino y después el detalle de productos.
-
-## Cambios principales
-
-- Menú lateral simplificado: Inicio, Auditoría, Transferencias y Alertas.
-- Directorio y Configuración ocultos visualmente sin eliminar lógica base.
-- Dashboard ajustado a nivel transferencia, no ingrediente.
-- Transferencia definida como: Fecha + Tienda origen + Proveedor destino.
-- Cada tarjeta de Transferencias agrupa varios productos de un mismo movimiento.
-- Detalle por producto disponible al seleccionar una transferencia.
-- Fecha visual en formato corto: `04 Jul`.
-- Filtro `Ocultar Coffee Patrol` activado por defecto.
-- Coffee Patrol se conserva como movimiento informativo y no exige ingreso.
-- El filtro Tienda analiza salidas de la tienda seleccionada desde Compras_Transferencias.
-- Región y DM continúan alimentándose desde Base_Directorio.
-- Carga por chunks conservada.
-- PWA y compatibilidad con GitHub Pages conservadas.
+Versión enfocada en calibrar la lectura, agrupación y validación operativa de transferencias para que la auditoría revise correctamente el año completo desde la base real de movimientos.
 
 ## Fuente de datos
 
 - Archivo fuente: `Base_Transferencias.xlsx`
-- Base principal: `Compras_Transferencias`
-- Cruce organizacional: `Base_Directorio`
-- Exclusión de auditoría principal: `Non Inventory`
+- Hoja principal: `Compras_Transferencias`
+- Directorio: `Base_Directorio`
+- Exclusión operativa: `Non Inventory`
 
-## Reglas de auditoría
+## Uso de la data
 
-- La auditoría inicia desde salidas.
-- Salida: cantidad negativa y costo total negativo.
-- Ingreso: cantidad positiva y costo total positivo.
-- Match inverso: tienda origen contra proveedor destino, y tienda destino contra proveedor origen.
-- Validación por producto: ingrediente, unidad, cantidad absoluta, costo unitario y costo total absoluto.
-- Si hay ingreso en otra fecha, se clasifica como `Ingreso con fecha diferente`.
-- Si no hay ingreso relacionado, se clasifica como `Sin ingreso`.
-- Si cambian cantidad o costo, se clasifica como diferencia operativa.
-- `38100 SBUX Coffee_Patrol` se clasifica como `Coffee Patrol` y no exige ingreso.
+La auditoría principal se genera desde `Compras_Transferencias`.
 
-## Estructura
+Columnas usadas:
 
-```text
-/assets
-/assets/icons
-/assets/images
-/css
-/data
-/data/chunks
-/js
-index.html
-manifest.json
-service-worker.js
-README.md
-```
+- `CeCo`
+- `Tienda`
+- `Ingrediente`
+- `Proveedor`
+- `Cantidad`
+- `Costo Unitario`
+- `Costo Total`
+
+`Base_Directorio` solo se usa para cruzar `CeCo` y obtener `Región` y `DM`.
+
+## Agrupación de transferencias
+
+Una transferencia se agrupa por:
+
+- Día
+- Tienda origen
+- Proveedor destino
+
+Varios ingredientes dentro del mismo día, tienda origen y proveedor destino se muestran como una sola transferencia con detalle de productos.
+
+## Auditoría Salida vs Ingreso
+
+La revisión inicia desde salidas:
+
+- Cantidad negativa
+- Costo Total negativo
+
+Después busca el ingreso inverso:
+
+- Cantidad positiva
+- Costo Total positivo
+
+Criterios de match:
+
+- CeCo destino contra CeCo del ingreso
+- Proveedor del ingreso contra CeCo de tienda origen
+- Ingrediente
+- Unidad
+- Cantidad absoluta
+- Costo unitario
+- Costo total absoluto
+- Fecha
+
+## Estados
+
+- Correcta
+- Ingreso encontrado
+- Ingreso con fecha diferente
+- Sin ingreso
+- Diferencia de cantidad
+- Diferencia de costo
+- Coffee Patrol
+- Revisar
+
+## Coffee Patrol
+
+`38100 SBUX Coffee_Patrol` se mantiene como movimiento informativo. No exige ingreso y puede ocultarse con el filtro de la interfaz.
+
+## Non Inventory
+
+Los ingredientes marcados como `Non Inventory` se excluyen de la auditoría principal. No se eliminan de la fuente, solo quedan fuera del análisis operativo.
+
+## Carga de datos
+
+La data se divide en chunks mensuales dentro de `/data/chunks` y se indexa en `/data/manifest-data.json`.
+
+Ningún archivo final supera 20 MB.
+
+## Compatibilidad
+
+- GitHub Pages compatible
+- PWA conservada
+- Service Worker actualizado
+- Rutas relativas
+- Sin Excel ni ZIP fuente dentro del proyecto final
 
 ## Validaciones realizadas
 
-- Proyecto empaquetado sin ZIP ni Excel fuente dentro de la versión final.
-- Ningún archivo final supera 20 MB.
-- Manifest de datos conservado y actualizado a V3.
-- Chunks de datos conservados bajo demanda.
-- Directorio y Configuración no aparecen en el menú lateral.
-- La interfaz no muestra textos técnicos de chunks, PWA o versión.
-- Exportación CSV no aparece.
-- Formato de fecha corto implementado en tarjetas y alertas.
-- Transferencias agrupadas por Fecha + Tienda origen + Proveedor destino.
-- Detalle por producto implementado por transferencia seleccionada.
-- Filtro Tienda aplicado sobre salidas de Compras_Transferencias.
-- Filtros Región y DM conservan cruce desde Base_Directorio.
-- Coffee Patrol queda oculto por defecto y puede mostrarse como informativo.
-- Sintaxis JavaScript validada.
-- Service Worker actualizado sin cachear chunks pesados.
-
-## Despliegue en GitHub Pages
-
-1. Subir el contenido de esta carpeta al repositorio.
-2. Activar GitHub Pages desde la rama publicada.
-3. Abrir `index.html` desde la URL generada por GitHub Pages.
-
-No se requiere servidor ni procesamiento adicional.
+- Proyecto empaquetado correctamente.
+- `Compras_Transferencias` usada como origen principal.
+- `Base_Directorio` usada solo para Región y DM.
+- Data regenerada desde `Base_Transferencias.xlsx`.
+- Chunks mensuales generados.
+- Ningún archivo supera 20 MB.
+- Filtro Tienda construido desde `Compras_Transferencias`.
+- Estado `Todos` deja visible toda la auditoría filtrada.
+- Transferencias agrupadas por Día + Tienda origen + Proveedor destino.
+- Detalle por producto disponible dentro de cada transferencia.
+- Non Inventory excluido de auditoría principal.
+- Coffee Patrol tratado como informativo.
+- Sintaxis JS validada.
+- Service Worker actualizado para V4.
