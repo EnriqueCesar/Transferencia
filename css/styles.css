@@ -5,3 +5,21 @@
 .status.revisar{border-color:#f4dda8;color:var(--amber);background:#fffaf0}
 .status.coffee-patrol{border-color:var(--green);color:var(--green);background:var(--green-050)}
 @media(min-width:1400px){.kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.warning{color:var(--amber)}
+.status.ingreso-con-fecha-diferente{border-color:#f4dda8;color:var(--amber);background:#fffaf0}
+.status.sin-ingreso,.status.falta-salida,.status.diferencia-de-cantidad,.status.diferencia-de-costo,.status.parcial{border-color:#f0c8ca;color:var(--danger);background:#fff6f6}
+.subtotal-strip{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:12px;margin-bottom:16px}
+.subtotal-strip div,.performance-grid article,.insight-grid>div{border:2px solid var(--line);border-radius:18px;background:#fff;padding:14px}
+.subtotal-strip span,.performance-grid p{display:block;margin:0 0 6px;color:var(--muted);font-size:.76rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em}
+.subtotal-strip strong,.performance-grid strong{display:block;color:var(--green);font-size:1.2rem}
+.performance-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px}
+.performance-grid article strong{font-size:clamp(1.6rem,3vw,2.2rem);letter-spacing:-.05em}
+.performance-grid article span{display:block;color:var(--muted);margin-top:6px;font-weight:700}
+.insight-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.insight-grid h4{margin:0 0 12px;color:var(--green)}
+.insight-grid p{display:flex;justify-content:space-between;gap:12px;margin:0;padding:10px 0;border-bottom:1px solid var(--line)}
+.insight-grid p:last-child{border-bottom:0}
+.insight-grid span{color:var(--muted);font-weight:800;white-space:nowrap}
+@media(max-width:980px){.subtotal-strip,.performance-grid,.insight-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.subtotal-strip,.performance-grid,.insight-grid{grid-template-columns:1fr}}
+@media print{.sidebar,.filter-panel,.hero-panel,.nav-cards,.ghost-action{display:none!important}.app-shell{display:block}.main-content{padding:0}.content-section{display:block!important}.card{break-inside:avoid}}

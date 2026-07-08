@@ -1,0 +1,24 @@
+Auditoría Transferencias v6-auditoria-desfase-ingreso-pdf
+
+Cambios principales:
+- Se fortaleció la lógica de auditoría para iniciar desde salidas.
+- Se agregó validación de ingreso en fecha diferente.
+- Se agregó margen de conciliación consolidado +/- $10.00.
+- Se agregaron subtotales en el detalle de transferencia.
+- Se agregó módulo Desempeño Tienda.
+- Se agregó exportación PDF mediante impresión nativa del navegador.
+- Se conservó Coffee Patrol como excepción válida.
+- Se conservó exclusión Non Inventory.
+- Se mantuvo compatibilidad PWA y GitHub Pages.
+
+Validaciones comprobadas:
+- app.js validado con node --check.
+- service-worker.js validado con node --check.
+- manifest.json validado como JSON.
+- data/manifest-data.json validado como JSON.
+- Proyecto servido por HTTP local con index.html respondiendo 200 OK.
+- Ningún archivo supera 20 MB.
+- Chunks de data conservados y divididos.
+- Luna Park -> Izcalli Mega tiene matches operativos en la data.
+- Existen casos de ingreso con fecha diferente detectables en la data.
+- Coffee Patrol existe como caso especial en salidas.
