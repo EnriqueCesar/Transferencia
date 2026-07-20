@@ -1,24 +1,29 @@
-Auditoría Transferencias v6-auditoria-desfase-ingreso-pdf
+Auditoría Transferencias v9 - actualización integral de base
 
-Cambios principales:
-- Se fortaleció la lógica de auditoría para iniciar desde salidas.
-- Se agregó validación de ingreso en fecha diferente.
-- Se agregó margen de conciliación consolidado +/- $10.00.
-- Se agregaron subtotales en el detalle de transferencia.
-- Se agregó módulo Desempeño Tienda.
-- Se agregó exportación PDF mediante impresión nativa del navegador.
-- Se conservó Coffee Patrol como excepción válida.
-- Se conservó exclusión Non Inventory.
-- Se mantuvo compatibilidad PWA y GitHub Pages.
+Fuente validada:
+- Base_Transferencias.xlsx / Compras_Transferencias.
+- 329,956 filas procesadas completas.
+- 12 encabezados requeridos encontrados por nombre.
+- Periodo: 01/01/2026 al 18/07/2026.
+- Semana normalizada como entero y Dia conservado como fecha real en origen.
 
-Validaciones comprobadas:
-- app.js validado con node --check.
-- service-worker.js validado con node --check.
-- manifest.json validado como JSON.
-- data/manifest-data.json validado como JSON.
-- Proyecto servido por HTTP local con index.html respondiendo 200 OK.
+Actualización detectada:
+- 985 registros nuevos respecto de la versión publicada.
+- 0 registros anteriores eliminados o sustituidos.
+- Las nuevas líneas abarcan enero a julio; se regeneraron los 7 bloques mensuales.
+- 84,297 transferencias recalculadas con la lógica vigente.
+- 213 agrupaciones nuevas, 2 agrupaciones absorbidas por la conciliación y 335 resultados modificados.
+
+Incidencias de origen:
+- 0 filas duplicadas.
+- 3,471 filas con cantidad cero.
+- 6,971 filas con costo total cero.
+- 20 filas cuya multiplicación cantidad por costo unitario difiere del costo total por más de $0.05.
+- 1 fila con signo inconsistente entre cantidad y costo total.
+
+Validación técnica:
+- Lógica, filtros, orden cronológico descendente y navegación sin cambios.
+- app.js y service-worker.js sin errores de sintaxis.
+- Manifest y todos los chunks JSON válidos.
+- Caché PWA incrementada a v9 para publicar la nueva base en GitHub Pages.
 - Ningún archivo supera 20 MB.
-- Chunks de data conservados y divididos.
-- Luna Park -> Izcalli Mega tiene matches operativos en la data.
-- Existen casos de ingreso con fecha diferente detectables en la data.
-- Coffee Patrol existe como caso especial en salidas.
