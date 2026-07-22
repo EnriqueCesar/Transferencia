@@ -2,7 +2,7 @@
 
 ## Versión
 
-`v11-agrupacion-fecha-ceco`
+`v12-filtro-proveedor-sin-ceco`
 
 ## Fuente
 
@@ -17,6 +17,9 @@
 - Solo existe una transferencia por fecha, CeCo origen y CeCo destino.
 - Una entrada mayor que su salida se concilia hasta la cantidad enviada y su remanente no crea una transferencia duplicada.
 - Las entradas completamente independientes se agrupan por fecha y pareja de CeCos antes de mostrarse como `Falta salida`.
+- Los valores sin CeCo inicial, incluido `Transferencias`, se agrupan como `Proveedor sin CeCo`.
+- El filtro `Ocultar proveedor sin CeCo / Transferencias` limpia los reportes sin eliminar registros.
+- El mensaje operativo `JUNTÉMONOS MÁS` se administra desde `data/juntemonos-mas.json`.
 - La coincidencia exacta de ingrediente tiene prioridad.
 - Si los nombres difieren, solo se concilia por equivalencia económica cuando unidad, cantidad y costo son compatibles y la opción es inequívoca.
 - Cada entrada se utiliza una sola vez.

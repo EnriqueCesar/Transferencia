@@ -32,8 +32,9 @@
     <main id="mainContent" class="main-content" tabindex="-1">
       <header class="hero-panel">
         <div class="hero-copy">
-          <p class="eyebrow">Auditoría operativa</p>
+          <p class="eyebrow" id="programTitle">Auditoría operativa</p>
           <h2>Valida salidas, entradas y desfases</h2>
+          <p class="hero-text program-message" id="programMessage" hidden></p>
           <p class="hero-text" id="friendlyStatus">Listo para revisar transferencias</p>
           <p class="hero-text" id="lastUpdated" aria-live="polite">Actualizado: --/--</p>
           <div class="hero-actions"><button class="ghost-action" id="resetFilters" type="button">Limpiar filtros</button></div>
@@ -56,6 +57,7 @@
           <label>Entrada / Salida<select id="directionFilter"><option value="">Todas</option><option value="salidas">Salidas</option><option value="entradas">Entradas</option></select></label>
           <label class="wide">Búsqueda<input id="searchFilter" type="search" placeholder="Tienda, proveedor, ingrediente o CeCo"></label>
           <label class="toggle-field"><input id="coffeeFilter" type="checkbox" checked><span>Ocultar Coffee Patrol</span></label>
+          <label class="toggle-field"><input id="unresolvedProviderFilter" type="checkbox" checked><span>Ocultar proveedor sin CeCo / Transferencias</span></label>
         </div>
       </section>
 
