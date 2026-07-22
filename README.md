@@ -2,7 +2,7 @@
 
 ## Versión
 
-`v10-ceco-bidireccional`
+`v11-agrupacion-fecha-ceco`
 
 ## Fuente
 
@@ -14,6 +14,9 @@
 - `Cantidad > 0`: entrada en el CeCo de la fila desde el CeCo inicial del proveedor.
 - Las fechas válidas del Excel se normalizan como `dd/mm/aaaa` y se almacenan como ISO para evitar cruces ambiguos.
 - La relación origen/destino se valida en ambos sentidos mediante CeCos de cinco dígitos.
+- Solo existe una transferencia por fecha, CeCo origen y CeCo destino.
+- Una entrada mayor que su salida se concilia hasta la cantidad enviada y su remanente no crea una transferencia duplicada.
+- Las entradas completamente independientes se agrupan por fecha y pareja de CeCos antes de mostrarse como `Falta salida`.
 - La coincidencia exacta de ingrediente tiene prioridad.
 - Si los nombres difieren, solo se concilia por equivalencia económica cuando unidad, cantidad y costo son compatibles y la opción es inequívoca.
 - Cada entrada se utiliza una sola vez.
